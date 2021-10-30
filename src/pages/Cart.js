@@ -1,18 +1,19 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import CartItem from '../componentes/CartItem'
-import ProductItem from '../componentes/productItem'
 import {items} from '../constantes'
 import {Card} from 'react-bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { CarritoContext } from '../context/CarritoContext'
 
- const Cart = ({cart,setCart,total, setTotal}) => {
+ const Cart = () => {
 /*  const [data, setData] = useState({
     name:"",
     tel:"",
     email:"",
     pass:""
 }) */
-   
+const {cart,setCart,total,setTotal} = useContext(CarritoContext)
+
 const [nombreProducto, setNombreProducto] = useState(null)
 const [cantidad, setCantidad] = useState(1)
 
@@ -24,14 +25,36 @@ const ingresar = (evento) => {
         
         if(item.nombre === nombreProducto) {
             setTotal(total + (cantidad*item.precio))
-            setCart([...cart,
-                {
-                    nombre: item.nombre,
-                    cantidad:cantidad,
-                    precio:item.precio,
-                    color:item.color
+            let existe = false
+
+            for (const itemCart of cart) {
+                if(itemCart.nombre === item.nombre){
+                    existe = true
                 }
-            ])
+            }
+            if(existe){
+                const newArray = cart.map(itemCart => {
+                    
+                    if(itemCart.nombre === item.nombre) {
+                        itemCart.cantidad += Number(cantidad);
+                        setTotal(total+(itemCart.precio*cantidad));
+                    }
+                    return itemCart;
+                 });
+                 
+                 setCart(newArray);
+            }
+            else{
+                setCart([...cart,
+                    {
+                        nombre: item.nombre,
+                        cantidad:Number(cantidad),
+                        precio:item.precio,
+                        color:item.color
+                    }
+                ])
+
+            }
         }
     }
 }
